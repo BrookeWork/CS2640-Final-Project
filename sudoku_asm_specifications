@@ -1,0 +1,25 @@
+ The main gameplay loop of sudoku will be handled by the file sudoku.asm. 
+
+ 1.   sudoku asm will first run generate_puzzle. 
+
+ 2.   Then it will welcome the player to sudoku, explain sudoku rules, and ask whether the user wants to play or exit. 
+
+ 3.   If the user chooses to play, the puzzle is displayed using print_grid. 
+
+ 4.   Then it will prompt the user for the row number and column number. 
+
+ 5.   Once these are entered, if the cell location is invalid or there is already a value in that cell, it will reject it and reprompt until valid values for a cell are entered. 
+
+ 6.   Then it will prompt for a number to place in that cell until the user enters a value from 1 to 9. 
+
+ 7.   Then the number is placed in that cell.  
+
+ 8.   The grid is checked by the verify_grid macro to see if the user won the game. 
+
+ 9.   If the user does not win yet, the user is prompted to either proceed or exit. 
+
+ 10.   Steps 3-10 are repeated until the user chooses to exit in step 10, or if the user is found to have won the game in step 8. 
+ 
+ 11.   If the user is found to have won in step 8, the player’s win is announced to the player, and the player is asked to either play or again or quit.
+
+ 12. Steps 3-11 are repeated until the player chooses to exit in step 10 or 11.
