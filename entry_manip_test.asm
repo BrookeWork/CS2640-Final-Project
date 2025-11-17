@@ -9,7 +9,7 @@
 .text
 main: #for testing
 	li $t0, 8
-	li $t1, 9
+	li $t1, 7
 	sw $t0, x
 	sw $t1, y
 	li $t1, 3
