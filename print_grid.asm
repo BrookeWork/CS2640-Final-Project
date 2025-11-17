@@ -1,3 +1,4 @@
+#Not completed, it only prints every entry right now, without formatting
 .include "entry_manip.asm"
 .macro print_grid
 	.data
