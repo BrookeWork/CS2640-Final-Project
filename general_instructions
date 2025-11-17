@@ -1,0 +1,10 @@
+In order to let multiple people work on and organize the program, sections of program instructions should be divided into macros contained in different files. We currently plan to include the following macros: 
+- store_entry(%x, %y, %value): This macro will store %value at column %x and row %y of the grid. This macro will be stored in file entry_manip.asm. 
+
+- load_entry(%x, %y, %variable): This macro will load into %variable the value stored at column %x and row %y of the grid. This macro will be stored in file entry_manip.asm. 
+
+- generate_puzzle: This macro will generate the puzzle by filling in some grid cells with numbers. This macro will be stored in file generate_puzzle.asm. 
+
+-print_grid: This macro prints the grid. This macro will be stored in file print_grid.asm 
+
+-verify_grid: This macro scans the entire grid to check if the board is correctly completed and the player has won. If the player wins, register ? Is set to 1. This macro will be stored in file verify_grid.asm 
