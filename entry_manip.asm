@@ -1,6 +1,6 @@
 .data
 .align 2
-grid: .space 364
+grid: .space 324
 .macro store_entry(%x, %y, %value)
 	lw $t0, %y
 	mul $t0, $t0, 9
