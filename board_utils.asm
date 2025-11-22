@@ -3,13 +3,13 @@
 .include "macros.asm"
 
 .macro row_body()
-	load_entry($t6, $t8, $t0) 
-	beq $t9, $t0, num_detected #if number in cell ($t0) equals the number to check ($t9) return 0
+	load_entry($t5, $a1, $t0) 
+	beq $a2, $t0, num_detected #if number in cell ($t0) equals the number to check ($a2) return 0
 .end_macro
 
 .macro col_body()
-	load_entry($t8, $t6, $t0) 
-	beq $t9, $t0, num_detected #if number in cell ($t0) equals the number to check ($t9) return 0
+	load_entry($a0, $t5, $t0) 
+	beq $a2, $t0, num_detected #if number in cell ($t0) equals the number to check ($a2) return 0
 .end_macro
 
 .macro box_outer()
@@ -17,10 +17,10 @@
 .end_macro
 
 .macro box_inner()
-	add $t0, $t6, $t2
-	add $t1, $t5, $t3
+	add $t0, $t5, $t2
+	add $t1, $t4, $t3
 	load_entry($t0, $t1, $t0) 
-	beq $t9, $t0, num_detected #if number in cell ($t0) equals the number to check ($t9) return 0
+	beq $a2, $t0, num_detected #if number in cell ($t0) equals the number to check ($a2) return 0
 .end_macro
 
 .globl safe_to_place
@@ -28,25 +28,22 @@
 # $a0 - x
 # $a1 - y
 # $a2 - number
+# uses regesters $t0 to $t5
 safe_to_place: 
-	#move arguments to temporary registers
-	move $t7, $a0
-	move $t8, $a1
-	move $t9, $a2
 	
 	#check if row is safe
-	for($t6, 0, 8, row_body)
+	for($t5, 0, 8, row_body)
 	
 	#check if col is safe
-	for($t6, 0, 8, col_body)
+	for($t5, 0, 8, col_body)
 	
 	#check if box is safe
 	#calculate the start position of the current box
-	li $t5, 3
-	modulo($t7, $t5, $t6) #mod x and 3 into $t6
-	sub $t6, $t7, $t6 #$t6 = x - $t6 to get box start x
-	modulo($t8, $t5, $t5) #mod y and 3 into $t5
-	sub $t5, $t8, $t5 #$t5 = y - $t5 to get box start y
+	li $t4, 3
+	modulo($a0, $t4, $t5) #mod x and 3 into $t5
+	sub $t5, $a0, $t5 #$t5 = x - $t5 to get box start x
+	modulo($a1, $t4, $t4) #mod y and 3 into $t4
+	sub $t4, $a1, $t4 #$t4 = y - $t4 to get box start y
 	
 	for($t2, 0, 2, box_outer)
 	

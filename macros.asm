@@ -2,7 +2,7 @@
 
 .macro printInt(%int)
 	li $v0, 1
-	add $a0, $zero, %x
+	add $a0, $zero, %int
 	syscall
 .end_macro
 
