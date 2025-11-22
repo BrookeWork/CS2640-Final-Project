@@ -45,3 +45,8 @@ loop:
 	add %regIterator, %regIteratWor, 1
 	ble %regIterator, %to, loop
 .end_macro
+
+.macro modulo (%a, %b, %result)
+	div     %a, %b
+	mfhi    %result
+.end_macro
