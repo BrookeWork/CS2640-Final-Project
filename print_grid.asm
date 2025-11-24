@@ -12,7 +12,7 @@
 		sw $s0, y_int
 		j loop
 	loop:
-		load_entry(x_int, y_int, number)
+		load_entry_mem(x_int, y_int, number)
 		lw $s2, number
 		jal print_entry
 		bgt $s0, 7, increase_y

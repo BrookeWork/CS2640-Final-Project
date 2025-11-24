@@ -12,13 +12,10 @@
 	move %dest, $v0
 .end_macro
 
-.macro printString(%str)
-.data
-myLabel: .asciiz %str
-.text
-	li $v0, 4
-	la $a0, myLabel
-	syscall
+.macro printString(%label)
+    li  $v0, 4
+    la  $a0, %label
+    syscall
 .end_macro
 
 .macro printChar(%char)
@@ -38,12 +35,12 @@ myLabel: .asciiz %str
 	syscall
 .end_macro
 
-.macro for (%regIterator, %from, %to, %bodyMacroName)
-	add %regIterator, $zero, %from
+.macro for_range(%iter, %from, %to, %bodyLabel)
+	add %iter, $zero, %from
 loop:
-	%bodyMacroName ()
-	add %regIterator, %regIteratWor, 1
-	ble %regIterator, %to, loop
+	jal %bodyLabel
+	add %iter, %iter, 1
+	ble %iter, %to, loop
 .end_macro
 
 .macro modulo (%a, %b, %result)
