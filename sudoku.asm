@@ -1,3 +1,4 @@
+# Adam Khalil, Brooke Landry, Christian Parkinson, TJ Vasquez
 .include "macros.asm"
 .include "print_grid.asm"
 .include "board_utils.asm"
