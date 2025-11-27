@@ -30,7 +30,6 @@ placed_loop:
 	#check if it is safe to place the number in the grid
 	safe_to_place($s1, $s2, $s3, $s4)
 	
-	printInt($s4)
 	beq $s4, $zero, placed_loop
 	
 	#now safe to place the number
@@ -40,6 +39,7 @@ placed_loop:
 	#if sucessfully placed increment $s0 and loop
 	add $s0, $s0, 1
 	blt $s0, 11, placed_loop
+	printChar('\n')
 	
 
 	#Use depth-first search to find a solution

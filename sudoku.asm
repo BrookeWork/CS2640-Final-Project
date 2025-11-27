@@ -29,8 +29,7 @@ main:
 	
 	print_grid()
 
-	li $v0, 10
-	syscall
+	end()
 
 .include "verify_grid.asm"
 .include "board_utils.asm"
