@@ -13,9 +13,9 @@
 .end_macro
 
 .macro printString(%label)
-    li  $v0, 4
-    la  $a0, %label
-    syscall
+	li  $v0, 4
+	la  $a0, %label
+	syscall
 .end_macro
 
 .macro printChar(%char)
@@ -44,6 +44,22 @@ loop:
 .end_macro
 
 .macro modulo (%a, %b, %result)
-	div     %a, %b
-	mfhi    %result
+	div	 %a, %b
+	mfhi	%result
+.end_macro
+
+.macro randi_range(%from, %to, %dest)
+	#range_size = (%to - %from + 1)
+	li $t9, %to #randi range
+	addi $t9, $t9, 1
+	li $t8, %from
+	subu $t9, $t9, $t8
+
+	#syscall 42: random int in [0, t9)
+	li $v0, 42
+	move $a1, $t9
+	syscall
+
+	#shift into target range: dest = v0 + from
+	addu %dest, $a0, $t8
 .end_macro

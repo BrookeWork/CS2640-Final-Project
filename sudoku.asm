@@ -1,7 +1,7 @@
 # Adam Khalil, Brooke Landry, Christian Parkinson, TJ Vasquez
 .include "macros.asm"
 .include "print_grid.asm"
-.include "generate_sample_puzzle.asm"
+.include "generate_puzzle.asm"
 
 
 .data
@@ -25,7 +25,7 @@
 .text
 .globl main
 main:
-	generate_sample_puzzle()
+	generate_puzzle(2)
 	
 	print_grid()
 
