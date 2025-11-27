@@ -1,6 +1,6 @@
 # Adam Khalil
 # verify_grid.asm:
-# Checks whether the global Sudoku grid is completely + correctly filled || basically solvable.
+# Checks whether the global Sudoku grid is completely + correctly filled || basically solved.
 # Returns:
 #   $v0 = 1  if the grid is a valid solved Sudoku
 #   $v0 = 0  otherwise
