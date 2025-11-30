@@ -7,6 +7,8 @@
 .data
 	.align 2
 	grid: .space 324
+	.align 2
+	initial_indicies: .space 44
 	welcome_msg: .asciiz "Welcome to MIPS Sudoku!\n"
 	difficulty_prompt: .asciiz "Enter a target difficulty (1-5): "
 	rules_msg: .asciiz "Enter row and column (1-9), then a number (1-9) to place.\n"
@@ -28,6 +30,8 @@ main:
 	generate_puzzle(2)
 	
 	print_grid()
+	la $t1, grid
+	print_array($t1, 81)
 
 	end()
 
