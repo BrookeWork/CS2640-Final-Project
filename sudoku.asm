@@ -14,6 +14,7 @@
 	welcome_msg: .asciiz "Welcome to MIPS Sudoku!\n"
 	#puzzle generation status messages
 	puzzle_gen_1: .asciiz "Step 1 Complete: 11 initial values placed from Las Vegas algorithm...\n"
+	restarting_gen: .asciiz "Max DFS backtracking reached, restarting generation...\n"
 	puzzle_gen_2: .asciiz "Step 2 Complete: Used depth-first search to find a solution...\n"
 	puzzle_gen_3: .asciiz "Step 3 Complete: Poked holes in the solution to create a puzzle...\n"
 	puzzle_gen_4: .asciiz "Step 4 Complete: Shuffled the puzzle for uniqueness...\n"
@@ -41,6 +42,12 @@ main:
 	print_array($t1, 81)
 	printChar('\n')
 	printInt($s7)
+	
+	la $a0, grid
+	jal clear_board
+	
+	printChar('\n')
+	print_grid()
 
 	end()
 

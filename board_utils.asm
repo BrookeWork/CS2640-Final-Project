@@ -84,3 +84,18 @@ num_detected:
 	lw   $ra, 0($sp)
 	addi $sp, $sp, 4
 	jr $ra
+
+#A function to clear a given board
+# $a0 - address of board to clear
+.globl clear_board
+clear_board:
+	add $t0, $a0, 320 # store ending address in $t0
+	li $t1, 0
+	
+clear_board_loop:
+	#store 0, increment, check if reached end of array
+	sw $t1, 0($a0)
+	add $a0, $a0, 4
+	ble $a0, $t0, clear_board_loop
+	
+	jr $ra
