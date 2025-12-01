@@ -8,8 +8,15 @@
 	.align 2
 	grid: .space 324
 	.align 2
+	terminal_vals: .space 324
+	.align 2
 	initial_indicies: .space 44
 	welcome_msg: .asciiz "Welcome to MIPS Sudoku!\n"
+	#puzzle generation status messages
+	puzzle_gen_1: .asciiz "Step 1 Complete: 11 initial values placed from Las Vegas algorithm...\n"
+	puzzle_gen_2: .asciiz "Step 2 Complete: Used depth-first search to find a solution...\n"
+	puzzle_gen_3: .asciiz "Step 3 Complete: Poked holes in the solution to create a puzzle...\n"
+	puzzle_gen_4: .asciiz "Step 4 Complete: Shuffled the puzzle for uniqueness...\n"
 	difficulty_prompt: .asciiz "Enter a target difficulty (1-5): "
 	rules_msg: .asciiz "Enter row and column (1-9), then a number (1-9) to place.\n"
 	play_prompt: .asciiz "Enter 1 to play, 0 to exit: "
@@ -32,6 +39,8 @@ main:
 	print_grid()
 	la $t1, grid
 	print_array($t1, 81)
+	printChar('\n')
+	printInt($s7)
 
 	end()
 

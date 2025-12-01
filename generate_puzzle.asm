@@ -55,15 +55,23 @@ placed_loop:
 	printChar('\n')
 	print_array($t1,11)
 	
+	printString(puzzle_gen_1)
+	
 depth_first_search:
 	#Step 2: Use depth-first search to find a solution
 	la $s0, grid
 	li $s4, 0 #index
+	li $s7, 0 #backtracking counter
 	
 dfs_loop:
 	#generate a random starting point
 	randi_range(1, 9, $s1)
 	move $s3, $s1 # store copy as starting point
+	#store terminal point in array
+	la $s0, terminal_vals
+	addu $s0, $s0, $s4
+	sw $s3, 0($s0)
+	
 	
 find_next_safe_num:
 	#calculate x and y
@@ -91,7 +99,6 @@ next_safe_up:
 overflow_reset: #reset to 1 if above 9
 	li $s1, 1
 	j next_safe_up
-	
 
 dfs_up:
 	#if no valid solutions
@@ -99,20 +106,26 @@ dfs_up:
 dec_index:
 	#loop back to next cell that we can modify
 	subu $s4, $s4, 4
-	la $t1, initial_indicies
-	not_in_array($s4, $t1, 11)
-	beq $v0, $zero, dec_index
 	
 	#if we go below 0, dfs has failed
 	blt $s4, 0, dfs_fail
 	
+	#skip immutable cells
+	la $t1, initial_indicies
+	not_in_array($s4, $t1, 11)
+	beq $v0, $zero, dec_index
+	
+	addi $s7, $s7, 1
 	#load value from cell and clear cell
 	la $s0, grid
 	addu $s0, $s0, $s4
 	lw $s1, 0($s0)
 	sw $zero, 0($s0)
 	
-	#move $s3, $s1 #set starting point for this cell
+	#load terminal value
+	la $s0, terminal_vals
+	addu $s0, $s0, $s4
+	lw $s3, 0($s0)
 	
 	add $s1, $s1, 1
 	bge $s1, 10, overflow_reset_up
@@ -121,11 +134,12 @@ dec_index:
 	#printChar(' ')
 	#printInt($s1)
 	#printChar('\n')
-	
+	beq $s1, $s3, dfs_up
 	j find_next_safe_num
 
 overflow_reset_up: #reset to 1 if above 9
 	li $s1, 1
+	beq $s1, $s3, dfs_up
 	j find_next_safe_num
 
 continue_dfs:
@@ -148,10 +162,10 @@ inc_index:
 	not_in_array($s4, $t1, 11)
 	beq $v0, $zero, inc_index
 	
-	ble $s4, 0, end
+	blt $s4, 0, dfs_fail
 	ble $s4, 320, dfs_loop
 	
-	j end
+	j dfs_complete
 
 	
 	#Step 3: Poke holes in the solution to create a puzzle
@@ -159,5 +173,6 @@ inc_index:
 dfs_fail:
 	printInt(-1)
 	printChar('\n')
-end:
+dfs_complete:
+	printString(puzzle_gen_2)
 .end_macro
