@@ -167,12 +167,47 @@ inc_index:
 	
 	j dfs_complete
 
-	
-	#Step 3: Poke holes in the solution to create a puzzle
-	#Step 4: Propagate (shuffle) the puzzle for uniqueness
 dfs_fail:
 	printInt(-1)
 	printChar('\n')
 dfs_complete:
 	printString(puzzle_gen_2)
+	#Step 3: Poke holes in the solution to create a puzzle
+	
+	#calculate lower bound of cells dug in $s7 and max cells left per row in $s6
+	#get lower bound by generating a random number between given_ranges[difficulty] and given_ranges[difficulty - 1]
+	la $s0, given_ranges
+	li $t0, %targetDifficulty
+	sll $t0, $t0, 2
+	add $s0, $s0, $t0
+	lw $s7, 0($s0)
+	subi $s0, $s0, 4
+	lw $s6, 0($s0)
+	printChar('\n')
+	printInt($s6)
+	printChar(' ')
+	printInt($s7)
+	randi_range($s7, $s6, $s7)
+	
+	#get max cells left per row using equation -x+6
+	li $s6, %targetDifficulty
+	neg $s6, $s6
+	addi $s6, $s6, 6
+	beq $s6, 1, evil
+	j dig
+
+#set bound to zero if evil difficulty
+evil:
+	li $s6, 0
+	
+	
+dig:
+	#dig cells
+	printChar('\n')
+	printInt($s6)
+	printChar('\n')
+	
+	
+	#Step 4: Propagate (shuffle) the puzzle for uniqueness
+	
 .end_macro

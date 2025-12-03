@@ -50,9 +50,9 @@ loop:
 
 .macro randi_range(%from, %to, %dest)
 	#range_size = (%to - %from + 1)
-	li $t9, %to #randi range
+	add $t9, $zero, %to #randi range
 	addi $t9, $t9, 1
-	li $t8, %from
+	add $t8, $zero, %from
 	subu $t9, $t9, $t8
 
 	#syscall 42: random int in [0, t9)
