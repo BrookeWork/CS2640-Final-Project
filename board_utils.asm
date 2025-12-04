@@ -99,3 +99,53 @@ clear_board_loop:
 	ble $a0, $t0, clear_board_loop
 	
 	jr $ra
+
+#A function to check if removing a given cell would break the max amount of zeroes stored in $s6
+# $a0 - x
+# $a1 - y
+# Returns:
+# $v0 - 1 if does meet requirement, 0 if doesn't meet requirement
+.globl meets_lower_bound
+meets_lower_bound:
+	
+	li $t3, 0 #how many zeroes in current iteration
+	li $t0, 0
+	#check if row has less than $s6 zeroes
+row_check:
+	
+	move $t1, $a1
+	load_entry($t0, $t1, $t2)
+	bnez $t2, row_loop
+	
+	#add zero and check if it breaks bound
+	addi $t3, $t3, 1
+	bgt $t3, $s6, breaks_bound
+
+row_loop:
+	addi $t0, $t0, 1
+	ble $t0, 8, row_check
+	
+	li $t3, 0
+	li $t1, 0
+
+col_check:
+	
+	move $t0, $a0
+	load_entry($t0, $t1, $t2)
+	bnez $t2, col_loop
+	
+	#add zero and check if it breaks bound
+	addi $t3, $t3, 1
+	bgt $t3, $s6, breaks_bound
+	
+col_loop:
+	addi $t1, $t1, 1
+	ble $t1, 8, col_check
+
+	li $v0, 1
+	jr $ra
+
+breaks_bound:
+	li $v0, 0
+	jr $ra
+	

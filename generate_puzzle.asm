@@ -174,8 +174,8 @@ dfs_complete:
 	printString(puzzle_gen_2)
 	#Step 3: Poke holes in the solution to create a puzzle
 	
-	#calculate lower bound of cells dug in $s7 and max cells left per row in $s6
-	#get lower bound by generating a random number between given_ranges[difficulty] and given_ranges[difficulty - 1]
+	#calculate lower bound of cells dug in $s7 and lower bound of givens per row/column in $s6
+	#get lower bound by generating a random number between given_ranges[difficulty] and given_ranges[difficulty - 1] - 1
 	la $s0, given_ranges
 	li $t0, %targetDifficulty
 	sll $t0, $t0, 2
@@ -183,31 +183,36 @@ dfs_complete:
 	lw $s7, 0($s0)
 	subi $s0, $s0, 4
 	lw $s6, 0($s0)
+	subi $s6, $s6, 1
+	randi_range($s7, $s6, $s7)
+	#subtract amount from 81 to get iterator
+	li $t0, 81
+	sub $s7, $t0, $s7
+	
+	#get max amount of zeroes per row by adding 3
+	li $s6, %targetDifficulty
+	addi $s6, $s6, 3
+	beq $s6, 8, evil
+	j dig
+
+#set bound to 9 if evil difficulty
+evil:
+	li $s6, 9
+
+dig:
 	printChar('\n')
 	printInt($s6)
 	printChar(' ')
 	printInt($s7)
-	randi_range($s7, $s6, $s7)
+	printChar('\n')
 	
-	#get max cells left per row using equation -x+6
-	li $s6, %targetDifficulty
-	neg $s6, $s6
-	addi $s6, $s6, 6
-	beq $s6, 1, evil
-	j dig
-
-#set bound to zero if evil difficulty
-evil:
-	li $s6, 0
-	
-	
-dig:
+dig_cell:
 	#dig cells
-	printChar('\n')
-	printInt($s6)
-	printChar('\n')
 	
 	
+	#if cell sucessfully dug, decrement counter and jump
+	subi $s7, $s7, 1
+	bgtz $s7, dig_cell
 	#Step 4: Propagate (shuffle) the puzzle for uniqueness
 	
 .end_macro
