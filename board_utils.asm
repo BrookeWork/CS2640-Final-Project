@@ -109,38 +109,38 @@ clear_board_loop:
 meets_lower_bound:
 	
 	li $t3, 0 #how many zeroes in current iteration
-	li $t0, 0
+	li $t4, 0 #use t4 as iterator
 	#check if row has less than $s6 zeroes
 row_check:
 	
-	move $t1, $a1
-	load_entry($t0, $t1, $t2)
+	move $t0, $a1
+	load_entry($t4, $t0, $t2)
 	bnez $t2, row_loop
 	
 	#add zero and check if it breaks bound
 	addi $t3, $t3, 1
-	bgt $t3, $s6, breaks_bound
+	bge $t3, $s6, breaks_bound
 
 row_loop:
-	addi $t0, $t0, 1
-	ble $t0, 8, row_check
+	addi $t4, $t4, 1
+	ble $t4, 8, row_check
 	
 	li $t3, 0
-	li $t1, 0
+	li $t4, 0
 
 col_check:
 	
-	move $t0, $a0
-	load_entry($t0, $t1, $t2)
+	move $t1, $a0
+	load_entry($t1, $t4, $t2)
 	bnez $t2, col_loop
 	
 	#add zero and check if it breaks bound
 	addi $t3, $t3, 1
-	bgt $t3, $s6, breaks_bound
+	bge $t3, $s6, breaks_bound
 	
 col_loop:
-	addi $t1, $t1, 1
-	ble $t1, 8, col_check
+	addi $t4, $t4, 1
+	ble $t4, 8, col_check
 
 	li $v0, 1
 	jr $ra

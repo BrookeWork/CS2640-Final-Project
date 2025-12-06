@@ -36,7 +36,7 @@
 .text
 .globl main
 main:
-	generate_puzzle(2)
+	generate_puzzle(3)
 	
 	print_grid()
 	la $t1, grid

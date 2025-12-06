@@ -33,8 +33,8 @@ placed_loop:
 	
 	#now safe to place the number
 	store_entry($s1, $s2, $s3)
-	printInt($s3)
-	printChar(' ')
+	#printInt($s3)
+	#printChar(' ')
 	
 	#store the index in indicies list
 	li $t0, 0
@@ -52,8 +52,8 @@ placed_loop:
 	blt $s0, 11, placed_loop
 	
 	la $t1, initial_indicies
-	printChar('\n')
-	print_array($t1,11)
+	#printChar('\n')
+	#print_array($t1,11)
 	
 	printString(puzzle_gen_1)
 	
@@ -75,11 +75,11 @@ dfs_loop:
 	
 find_next_safe_num:
 	#calculate x and y
-	srl   $t2, $s4, 2 # t2 = index / 4
-	li    $t3, 9
-	div   $t2, $t3
-	mflo  $t1# y = t2 / 9
-	mfhi  $t0# x = t2 % 9
+	srl $t2, $s4, 2 # t2 = index / 4
+	li $t3, 9
+	div $t2, $t3
+	mflo $t1# y = t2 / 9
+	mfhi $t0# x = t2 % 9
 	
 	#check if $s1 is safe to place
 	safe_to_place($t0, $t1, $s1, $s2)
@@ -200,19 +200,57 @@ evil:
 	li $s6, 9
 
 dig:
-	printChar('\n')
+	#dig cells
 	printInt($s6)
 	printChar(' ')
 	printInt($s7)
 	printChar('\n')
 	
-dig_cell:
-	#dig cells
+	#load grid into s0
+	la $s0, grid
+	addi $t9, $s0, 324 #end pointer
 	
+check_cell:
+	#get x and y of current index
+	la $t0, grid
+	sub $s1, $s0, $t0
+	srl $t1, $s1, 2 # t1 = index / 4
+	li $t3, 9
+	div $t1, $t3
+	mflo $s3# y = t1 / 9
+	mfhi $s2# x = t1 % 9
+	
+	#move into arguments and check if it meets the lower bound requirement
+	move $a0, $s2
+	move $a1, $s3
+
+	jal meets_lower_bound
+	
+	beqz $v0, cannot_dig
+	
+	j dig_cell
+	
+cannot_dig:
+	#if cell cannot be dug, check the next one
+	addi $s0, $s0, 4
+	bge $s0, $t9, digging_complete
+	j check_cell
+	 
+dig_cell:
 	
 	#if cell sucessfully dug, decrement counter and jump
 	subi $s7, $s7, 1
-	bgtz $s7, dig_cell
+	sw $zero, 0($s0)
+	addi $s0, $s0, 4
+	
+	bge $s0, $t9, digging_complete
+	bgtz $s7, check_cell
+	
+digging_complete:
+	printString(puzzle_gen_3)
+	printInt($s7)
+	printChar('\n')
+	
 	#Step 4: Propagate (shuffle) the puzzle for uniqueness
 	
 .end_macro
