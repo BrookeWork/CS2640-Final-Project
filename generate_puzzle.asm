@@ -251,6 +251,76 @@ digging_complete:
 	printInt($s7)
 	printChar('\n')
 	
-	#Step 4: Propagate (shuffle) the puzzle for uniqueness
+	#Step 4: Propagate (shuffle non-destructively) the puzzle for uniqueness
+propagate:
+	#get how many times we will propagate the board in s0
+	randi_range(2, 10, $s0)
+
+propagate_loop_start:
+	#choose which type of propagation to do
+	randi_range(0, 2, $s1)
+	beq $s1, 0, rotate
+	beq $s1, 1, swap_block_columns
+	beq $s1, 2, swap_random_columns
+
+rotate:
+	#rotate the whole grid 90 degrees clockwise using helper function
+	jal rotate_grid_90_right
+	j propagate_loop
+
+swap_block_columns:
+	#swap two columns of blocks
 	
+	#get the index of the two block columns
+	randi_range(0, 2, $s2)
+	randi_range(1, 2, $s3)
+	add $s3, $s3, $s2
+	li $t0, 3
+	modulo($s3, $t0, $s3)
+	
+	mul $a0, $t0, $s2
+	mul $a1, $t0, $s3
+	
+	#swap the 3 columns in the block
+	jal swap_columns
+	
+	addi $a0, $a0, 1
+	addi $a1, $a1, 1
+	jal swap_columns
+	
+	addi $a0, $a0, 1
+	addi $a1, $a1, 1
+	jal swap_columns
+	
+	j propagate_loop
+
+swap_random_columns:
+	#swap two columns in the same column of blocks
+	
+	#generate a random column of blocks
+	randi_range(0, 2, $s2)
+	li $t0, 3
+	mul $s2, $t0, $s2
+	
+	#generate random columns
+	randi_range(0, 2, $s3)
+	randi_range(1, 2, $s4)
+	add $s4, $s4, $s3
+	li $t0, 3
+	modulo($s4, $t0, $s4)
+	
+	#offset by block
+	add $a0, $s3, $s2
+	add $a1, $s4, $s2
+	
+	jal swap_columns
+	
+	j propagate_loop
+	
+propagate_loop:
+	subi $s0, $s0, 1
+	bnez $s0, propagate_loop_start
+
+done:
+	printString(puzzle_gen_4)
 .end_macro
