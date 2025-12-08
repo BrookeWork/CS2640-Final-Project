@@ -4,8 +4,6 @@
 .include "macros.asm"
 .include "print_grid.asm"
 .include "generate_sample_puzzle.asm"
-#.include "verify_grid.asm"
-#.include "brooke_board_utils.asm"
 
 .data
 	.align 2
@@ -36,15 +34,16 @@ main:
 	printString(rules_msg)
 	printString(unchangeable_msg)
 	printString(play_prompt)
-	getInt($t0)
+	jal get_valid_int
+	move $t0, $v0
 	beqz $t0, exit
-	#printString(difficulty_prompt)
-	#getInt($t0)
 	generate_sample_puzzle()
 	j turns
+
 turns:
 	print_grid()
 	j get_move
+
 get_move:
 	jal get_row
 	jal get_col
@@ -63,36 +62,66 @@ get_move:
 	beq $v0, 1, place
 	printString(invalid_move_msg)
 	j continue_or_stop
+
 get_row:
+	addi $sp, $sp, -4
+	sw $ra, 0($sp)
+row_retry:
 	printString(row_prompt)
-	getInt($t1)
+	jal get_valid_int
+	move $t1, $v0
 	blt $t1, 1, bad_input_row
 	bgt $t1, 9, bad_input_row
+	lw $ra, 0($sp)
+	addi $sp, $sp, 4
 	jr $ra
 bad_input_row:
 	printString(invalid_input_msg)
-	j get_row
+	j row_retry
+
 get_col:
+	addi $sp, $sp, -4
+	sw $ra, 0($sp)
+col_retry:
 	printString(col_prompt)
-	getInt($t0)
+	jal get_valid_int
+	move $t0, $v0
 	blt $t0, 1, bad_input_col
 	bgt $t0, 9, bad_input_col
+	lw $ra, 0($sp)
+	addi $sp, $sp, 4
 	jr $ra
 bad_input_col:
 	printString(invalid_input_msg)
-	j get_col
+	j col_retry
+
 get_num:
+	addi $sp, $sp, -4
+	sw $ra, 0($sp)
+num_retry:
 	printString(num_prompt)
-	getInt($t2)
+	jal get_valid_int
+	move $t2, $v0
 	blt $t2, 1, bad_input_num
 	bgt $t2, 9, bad_input_num
+	lw $ra, 0($sp)
+	addi $sp, $sp, 4
 	jr $ra
 bad_input_num:
 	printString(invalid_input_msg)
-	j get_num
+	j num_retry
+
+# Simple integer input routine
+# Returns: $v0 = integer read
+get_valid_int:
+	li $v0, 5
+	syscall
+	jr $ra
+
 taken:
 	printString(invalid_choice_msg)
 	j get_move
+
 place:
 	lw $a0, column
 	lw $a1, row
@@ -102,17 +131,22 @@ place:
 	jal verify_grid
 	beq $v0, 1, win
 	j continue_or_stop
+
 continue_or_stop:
 	printString(continue_prompt)
-	getInt($t0)
+	jal get_valid_int
+	move $t0, $v0
 	beqz $t0, exit
 	j turns
+
 win:
 	printString(solved_msg)
 	j exit
+
 exit:
 	printString(goodbye_msg)
 	li $v0, 10
 	syscall
+
 .include "verify_grid.asm"
 .include "board_utils.asm"
