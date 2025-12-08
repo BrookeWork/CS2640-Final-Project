@@ -11,6 +11,7 @@
 	terminal_vals: .space 324
 	.align 2
 	initial_indicies: .space 44
+	solution_count: .word 0
 	given_ranges: .word 70, 50, 36, 32, 28, 22
 	welcome_msg: .asciiz "Welcome to MIPS Sudoku!\n"
 	#puzzle generation status messages
@@ -33,24 +34,20 @@
 	solved_msg: .asciiz "Congratulations, you solved the puzzle!\n"
 	goodbye_msg: .asciiz "Goodbye!\n"
 
+
 .text
 .globl main
 main:
-	generate_puzzle(5)
+	generate_puzzle(2)
 	
 	print_grid()
 	la $t1, grid
 	print_array($t1, 81)
 	printChar('\n')
 	printInt($s7)
-	
-	la $a0, grid
-	jal clear_board
-	
-	printChar('\n')
-	print_grid()
 
 	end()
 
 .include "verify_grid.asm"
 .include "board_utils.asm"
+.include "dfs.asm"

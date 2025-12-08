@@ -11,6 +11,18 @@
 .end_macro
 
 .macro generate_puzzle(%targetDifficulty)
+	# Save all $s registers except $s5
+	subi $sp, $sp, 32
+	sw $s0,  0($sp)
+	sw $s1, 4($sp)
+	sw $s2, 8($sp)
+	sw $s3, 12($sp)
+	sw $s4, 16($sp)
+	sw $s6, 20($sp)
+	sw $s7, 24($sp)
+	
+	# (byte at 28($sp) left as padding / free)
+	
 	#Step 1: Place 11 initial values in Las Vegas algorithm
 	li $s0, 0
 	
@@ -62,7 +74,7 @@ depth_first_search:
 	la $s0, grid
 	li $s4, 0 #index
 	li $s7, 0 #backtracking counter
-	
+
 dfs_loop:
 	#generate a random starting point
 	randi_range(1, 9, $s1)
@@ -100,6 +112,29 @@ overflow_reset: #reset to 1 if above 9
 	li $s1, 1
 	j next_safe_up
 
+dfs_restart:
+	printString(restarting_gen)
+	#clear grid
+	la $a0, grid
+	jal clear_board
+	
+	# clear initial indices array
+	la $t0, initial_indicies
+	li $t1, 0
+	li $t2, 11
+clear_initial_loop:
+	sw $t1, 0($t0)
+	addi $t0, $t0, 4
+	addi $t2, $t2, -1
+	bgtz $t2, clear_initial_loop
+
+	# reset DFS state registers
+	li $s0, 0 # used for index in placed_loop
+	li $s4, 0 # DFS index
+	li $s7, 0 # backtrack counter
+
+	j placed_loop
+
 dfs_up:
 	#if no valid solutions
 	#go back one index, get the value, increase it and try again
@@ -116,6 +151,11 @@ dec_index:
 	beq $v0, $zero, dec_index
 	
 	addi $s7, $s7, 1
+	
+	#restart if over 2000 backtracks
+	li $t9, 2000
+	bgt $s7, $t9, dfs_restart
+	
 	#load value from cell and clear cell
 	la $s0, grid
 	addu $s0, $s0, $s4
@@ -130,10 +170,6 @@ dec_index:
 	add $s1, $s1, 1
 	bge $s1, 10, overflow_reset_up
 	
-	#printChar('u')
-	#printChar(' ')
-	#printInt($s1)
-	#printChar('\n')
 	beq $s1, $s3, dfs_up
 	j find_next_safe_num
 
@@ -143,12 +179,6 @@ overflow_reset_up: #reset to 1 if above 9
 	j find_next_safe_num
 
 continue_dfs:
-	#printInt($s4)
-	#printChar(' ')
-	#printInt($s3)
-	#printChar(' ')
-	#printInt($s1)
-	#printChar('\n')	
 
 	#place valid number in grid
 	la $s0, grid
@@ -200,11 +230,6 @@ evil:
 	li $s6, 9
 
 dig:
-	#dig cells
-	printInt($s6)
-	printChar(' ')
-	printInt($s7)
-	printChar('\n')
 	
 	#load grid into s0
 	la $s0, grid
@@ -255,10 +280,16 @@ unique_loop_start:
 	
 	#if both cheks pass, run the DFS with new number there
 	sw $s4, 0($s0)
-	jal dfs
 	
-	#if dfs fails and returns 0, there is a second solution
-	beqz $v0, second_solution
+
+	# run DFS with solution counter already zeroed
+	sw $zero, solution_count   # reset solution counter
+	sw $zero, 0($s0)          # dug cell temporarily
+	jal dfs
+
+	# check DFS result
+	lw $t0, solution_count
+	bgt $t0, 1, second_solution  # more than 1 solution cannot dig
 	
 	sw $zero, 0($s0)
 	addi $s4, $s4, 1
@@ -288,13 +319,16 @@ dig_cell:
 	sw $zero, 0($s0)
 	addi $s0, $s0, 4
 	
-	bge $s0, $t9, digging_complete
 	bgtz $s7, check_cell
+	bge $s0, $t9, digging_complete
+	
 	
 digging_complete:
 	printString(puzzle_gen_3)
 	printInt($s7)
 	printChar('\n')
+	
+	j done
 	
 	#Step 4: Propagate (shuffle non-destructively) the puzzle for uniqueness
 propagate:
@@ -368,4 +402,14 @@ propagate_loop:
 
 done:
 	printString(puzzle_gen_4)
+	# Restore saved $s registers
+	lw $s0, 0($sp)
+	lw $s1, 4($sp)
+	lw $s2, 8($sp)
+	lw $s3, 12($sp)
+	lw $s4, 16($sp)
+	lw $s6, 20($sp)
+	lw $s7, 24($sp)
+	addi $sp, $sp, 32
 .end_macro
+
