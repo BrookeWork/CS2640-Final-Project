@@ -10,6 +10,12 @@
 	grid: .space 324
 	row: .word 0
 	column: .word 0
+	.align 2
+    terminal_vals: .space 324
+    .align 2
+    initial_indicies: .space 44
+    solution_count: .word 0
+    given_ranges: .word 70, 50, 36, 32, 28, 22
 	user_value: .word 0
 	input_buffer: .space 10  # Buffer for string input
 	welcome_msg: .asciiz "Welcome to MIPS Sudoku!\n"
@@ -30,6 +36,8 @@
 	col_prompt: .asciiz "Column (1-9 or 0 to restart turn): "
 	num_prompt: .asciiz "Number (1-9 or 0 to restart turn): "
 	invalid_input_msg: .asciiz "Invalid input, must be between 1 and 9.\n"
+	invalid_difficulty_msg: .asciiz "Invalid input, must be between 1 and 5.\n"
+	invalid_play_msg: .asciiz "Invalid input, must be either 0 or 1.\n"
 	invalid_move_msg: .asciiz "That move is not allowed by Sudoku rules.\n"
 	continue_prompt: .asciiz "Enter 1 to continue playing, 0 to exit: "
 	solved_msg: .asciiz "Congratulations, you solved the puzzle!\n"
@@ -41,29 +49,70 @@ main:
 	printString(welcome_msg)
 	printString(rules_msg)
 	printString(unchangeable_msg)
+	
+	# Ask for difficulty
+	printString(difficulty_prompt)
+	jal get_valid_int
+	move $s5, $v0  # Store difficulty in $s5
+	
+	# Validate difficulty (1-5)
+	blt $s5, 1, invalid_difficulty
+	bgt $s5, 5, invalid_difficulty
+	j generate_start
+	
+invalid_difficulty:
+	printString(invalid_difficulty_msg)
+	printString(difficulty_prompt)
+	jal get_valid_int
+	move $s5, $v0
+	blt $s5, 1, invalid_difficulty
+	bgt $s5, 5, invalid_difficulty
+	
+generate_start:
+	# Generate puzzle with chosen difficulty
+	generate_puzzle($s5)
+	
 	printString(play_prompt)
 	jal get_valid_int
 	move $t0, $v0
+	blt $t0, 0, invalid_play
+	bgt $t0, 1, invalid_play
 	beqz $t0, exit
-	generate_sample_puzzle()
 	j turns
+
+invalid_play:
+	printString(invalid_play_msg)
+	printString(play_prompt)
+	jal get_valid_int
+	move $t0, $v0
+	blt $t0, 0, invalid_play
+	bgt $t0, 1, invalid_play
+	beqz $t0, exit
 
 turns:
 	print_grid()
 	j get_move
 
 get_move:
-	# Clear any stale register values
-	li $t0, 0
-	li $t1, 0
-	li $t2, 0
+	# Get row, column, and number from user
 	jal get_row
+	move $s0, $t1    # Save row in $s0
+	
 	jal get_col
+	move $s1, $t0    # Save column in $s1
+	
 	jal get_num
-	addi $s1, $s1, -1 #Currently holds column
-	addi $s0, $s0, -1 #Currently holds row
+	move $s2, $t2    # Save number in $s2
+	
+	# Convert from 1-9 to 0-8
+	addi $s1, $s1, -1  # column
+	addi $s0, $s0, -1  # row
+	
+	# Check if cell is already filled
 	load_entry($s1, $s0, $s3)
 	bne $s3, 0, taken
+	
+	# Check if move is valid
 	move $a0, $s1
 	move $a1, $s0
 	move $a2, $s2
@@ -96,9 +145,8 @@ bad_input_row:
 	j row_retry
 
 get_col:
-	addi $sp, $sp, -8
-	sw $ra, 4($sp)
-	sw $t1, 0($sp)      # Save row from get_row
+	addi $sp, $sp, -4
+	sw $ra, 0($sp)
 col_retry:
 	printString(col_prompt)
 	jal get_valid_int
@@ -106,23 +154,20 @@ col_retry:
 	beqz $t0, restart_turn_col    # 0 = restart turn
 	blt $t0, 1, bad_input_col
 	bgt $t0, 9, bad_input_col
-	lw $t1, 0($sp)      # Restore row
-	lw $ra, 4($sp)
-	addi $sp, $sp, 8
+	lw $ra, 0($sp)
+	addi $sp, $sp, 4
 	jr $ra
 bad_input_col:
 	printString(invalid_input_msg)
 	j col_retry
 restart_turn_col:
-	lw $ra, 4($sp)
-	addi $sp, $sp, 8
+	lw $ra, 0($sp)
+	addi $sp, $sp, 4
 	j restart_turn
 
 get_num:
-	addi $sp, $sp, -12
-	sw $ra, 8($sp)
-	sw $t1, 4($sp)      # Save row
-	sw $t0, 0($sp)      # Save column
+	addi $sp, $sp, -4
+	sw $ra, 0($sp)
 num_retry:
 	printString(num_prompt)
 	jal get_valid_int
@@ -130,17 +175,15 @@ num_retry:
 	beqz $t2, restart_turn_num    # 0 = restart turn
 	blt $t2, 1, bad_input_num
 	bgt $t2, 9, bad_input_num
-	lw $t0, 0($sp)      # Restore column
-	lw $t1, 4($sp)      # Restore row
-	lw $ra, 8($sp)
-	addi $sp, $sp, 12
+	lw $ra, 0($sp)
+	addi $sp, $sp, 4
 	jr $ra
 bad_input_num:
 	printString(invalid_input_msg)
 	j num_retry
 restart_turn_num:
-	lw $ra, 8($sp)
-	addi $sp, $sp, 12
+	lw $ra, 0($sp)
+	addi $sp, $sp, 4
 	j restart_turn
 
 # Safe integer input routine using string reading

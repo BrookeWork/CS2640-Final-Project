@@ -1,6 +1,7 @@
 # TJ Vasquez
 # generate_puzzle.asm
 
+
 #macro wrapper for safe to place function
 .macro safe_to_place(%x, %y, %num, %dest)
 	move $a0, %x
@@ -45,8 +46,6 @@ placed_loop:
 	
 	#now safe to place the number
 	store_entry($s1, $s2, $s3)
-	#printInt($s3)
-	#printChar(' ')
 	
 	#store the index in indicies list
 	li $t0, 0
@@ -64,8 +63,6 @@ placed_loop:
 	blt $s0, 11, placed_loop
 	
 	la $t1, initial_indicies
-	#printChar('\n')
-	#print_array($t1,11)
 	
 	printString(puzzle_gen_1)
 	
@@ -207,7 +204,7 @@ dfs_complete:
 	#calculate lower bound of cells dug in $s7 and lower bound of givens per row/column in $s6
 	#get lower bound by generating a random number between given_ranges[difficulty] and given_ranges[difficulty - 1] - 1
 	la $s0, given_ranges
-	li $t0, %targetDifficulty
+	move $t0, %targetDifficulty
 	sll $t0, $t0, 2
 	add $s0, $s0, $t0
 	lw $s7, 0($s0)
@@ -220,7 +217,7 @@ dfs_complete:
 	sub $s7, $t0, $s7
 	
 	#get max amount of zeroes per row by adding 3
-	li $s6, %targetDifficulty
+	move $s6, %targetDifficulty
 	addi $s6, $s6, 3
 	beq $s6, 8, evil
 	j dig
@@ -409,4 +406,3 @@ done:
 	lw $s7, 24($sp)
 	addi $sp, $sp, 32
 .end_macro
-
