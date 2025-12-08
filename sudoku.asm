@@ -36,8 +36,8 @@ main:
 	printString(rules_msg)
 	printString(unchangeable_msg)
 	printString(play_prompt)
-	getInt($t0)
-	beqz $t0, exit
+	getInt($s0)
+	beqz $s0, exit
 	#printString(difficulty_prompt)
 	#getInt($t0)
 	generate_sample_puzzle()
@@ -49,43 +49,43 @@ get_move:
 	jal get_row
 	jal get_col
 	jal get_num
-	addi $t0, $t0, -1 #Currently holds column
-	addi $t1, $t1, -1 #Currently holds row
-	load_entry($t0, $t1, $s2)
-	bne $s2, 0, taken
-	move $a0, $t0
-	move $a1, $t1
-	move $a2, $t2
-	sw $t0, column
-	sw $t1, row
-	sw $t2, user_value
+	addi $s1, $s1, -1 #Currently holds column
+	addi $s0, $s0, -1 #Currently holds row
+	load_entry($s1, $s0, $s3)
+	bne $s3, 0, taken
+	move $a0, $s1
+	move $a1, $s0
+	move $a2, $s2
+	sw $s1, column
+	sw $s0, row
+	sw $s2, user_value
 	jal safe_to_place
 	beq $v0, 1, place
 	printString(invalid_move_msg)
 	j continue_or_stop
 get_row:
 	printString(row_prompt)
-	getInt($t1)
-	blt $t1, 1, bad_input_row
-	bgt $t1, 9, bad_input_row
+	getInt($s0)
+	blt $s0, 1, bad_input_row
+	bgt $s0, 9, bad_input_row
 	jr $ra
 bad_input_row:
 	printString(invalid_input_msg)
 	j get_row
 get_col:
 	printString(col_prompt)
-	getInt($t0)
-	blt $t0, 1, bad_input_col
-	bgt $t0, 9, bad_input_col
+	getInt($s1)
+	blt $s1, 1, bad_input_col
+	bgt $s1, 9, bad_input_col
 	jr $ra
 bad_input_col:
 	printString(invalid_input_msg)
 	j get_col
 get_num:
 	printString(num_prompt)
-	getInt($t2)
-	blt $t2, 1, bad_input_num
-	bgt $t2, 9, bad_input_num
+	getInt($s2)
+	blt $s2, 1, bad_input_num
+	bgt $s2, 9, bad_input_num
 	jr $ra
 bad_input_num:
 	printString(invalid_input_msg)
@@ -104,8 +104,8 @@ place:
 	j continue_or_stop
 continue_or_stop:
 	printString(continue_prompt)
-	getInt($t0)
-	beqz $t0, exit
+	getInt($s0)
+	beqz $s0, exit
 	j turns
 win:
 	printString(solved_msg)
