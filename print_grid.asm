@@ -1,5 +1,4 @@
 #A macro that prints a grid in a neat format
-.include "entry_manip.asm"
 .macro print_grid
 	.data
 		x_int: .word 0
