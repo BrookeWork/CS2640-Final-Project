@@ -3,7 +3,7 @@
 .include "entry_manip.asm"
 .include "macros.asm"
 .include "print_grid.asm"
-.include "generate_puzzle.asm"
+.include "generate_sample_puzzle.asm"
 
 .data
 	.align 2
@@ -13,13 +13,7 @@
 	user_value: .word 0
 	input_buffer: .space 10  # Buffer for string input
 	welcome_msg: .asciiz "Welcome to MIPS Sudoku!\n"
-	#puzzle generation status messages
-	puzzle_gen_1: .asciiz "Step 1 Complete: 11 initial values placed from Las Vegas algorithm...\n"
-	restarting_gen: .asciiz "Max DFS backtracking reached, restarting generation...\n"
-	puzzle_gen_2: .asciiz "Step 2 Complete: Used depth-first search to find a solution...\n"
-	puzzle_gen_3: .asciiz "Step 3 Complete: Poked holes in the solution to create a puzzle...\n"
-	puzzle_gen_4: .asciiz "Step 4 Complete: Shuffled the puzzle for uniqueness...\n"
-	difficulty_prompt: .asciiz "Enter a target difficulty (1 Easy - 5 Evil): "
+	difficulty_prompt: .asciiz "Enter a target difficulty (1-5): "
 	rules_msg: .asciiz "Enter row and column (1-9), then a number (1-9) to place.\n"
 	unchangeable_msg: .asciiz "You cannot change a number on the grid once it is placed, so place wisely.\n"
 	play_prompt: .asciiz "Enter 1 to play, 0 to exit: "
@@ -34,7 +28,6 @@
 	continue_prompt: .asciiz "Enter 1 to continue playing, 0 to exit: "
 	solved_msg: .asciiz "Congratulations, you solved the puzzle!\n"
 	goodbye_msg: .asciiz "Goodbye!\n"
-
 
 .text
 main:
@@ -288,4 +281,3 @@ exit:
 
 .include "verify_grid.asm"
 .include "board_utils.asm"
-.include "dfs.asm"
