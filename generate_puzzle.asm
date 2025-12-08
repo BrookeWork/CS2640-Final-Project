@@ -319,14 +319,13 @@ dig_cell:
 	sw $zero, 0($s0)
 	addi $s0, $s0, 4
 	
-	bgtz $s7, check_cell
 	bge $s0, $t9, digging_complete
+	bgtz $s7, check_cell
+	
 	
 	
 digging_complete:
 	printString(puzzle_gen_3)
-	printInt($s7)
-	printChar('\n')
 	
 	#Step 4: Propagate (shuffle non-destructively) the puzzle for uniqueness
 propagate:
