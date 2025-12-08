@@ -18,14 +18,14 @@
 .end_macro
 
 .macro load_entry(%x, %y, %variable)
-	add $t0, $zero, %y #entered load_entry
-	mul $t0, $t0, 9
-	add $t1, $zero, %x
-	add $t0, $t0, $t1
-	sll $t0, $t0, 2
-	la $t1, grid
-	addu $t1, $t1, $t0
-	lw %variable, 0($t1)
+	add $s0, $zero, %y #entered load_entry
+	mul $s0, $s0, 9
+	add $s1, $zero, %x
+	add $s0, $s0, $s1
+	sll $s0, $s0, 2
+	la $s1, grid
+	addu $s1, $s1, $s0
+	lw %variable, 0($s1)
 .end_macro
 
 .macro store_entry(%x, %y, %value)
