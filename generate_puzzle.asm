@@ -228,16 +228,61 @@ check_cell:
 	
 	beqz $v0, cannot_dig
 	
-	j dig_cell
+	#jump to part 2, checking uniqueness
+	j check_unique
 	
+check_unique:
+	#if cell can be dug, check if digging it would violate uniqueness
+	#loop through 1-9 except for original number
+	li $s4, 1
+	lw $s5, 0($s0) #store original number in $s5
+	sw $zero, 0($s0)
+
+unique_loop_start:
+	#loop to 9
+	bgt $s4, 9, unique_success
+	#continue if not original number
+	beq $s4, $s5, continue_unique
+	
+	#continue if not safe to place
+	move $a0, $s2
+	move $a1, $s3
+	move $a2, $s4
+	
+	jal safe_to_place
+	
+	beqz $v0, continue_unique
+	
+	#if both cheks pass, run the DFS with new number there
+	sw $s4, 0($s0)
+	jal dfs
+	
+	#if dfs fails and returns 0, there is a second solution
+	beqz $v0, second_solution
+	
+	sw $zero, 0($s0)
+	addi $s4, $s4, 1
+	j unique_loop_start
+
+unique_success:
+	sw $s5, 0($s0)
+	j dig_cell
+
+second_solution:
+	sw $s5, 0($s0)
+	j cannot_dig
+
+continue_unique:
+	addi $s4, $s4, 1
+	j unique_loop_start
+
 cannot_dig:
 	#if cell cannot be dug, check the next one
 	addi $s0, $s0, 4
 	bge $s0, $t9, digging_complete
 	j check_cell
-	 
+
 dig_cell:
-	
 	#if cell sucessfully dug, decrement counter and jump
 	subi $s7, $s7, 1
 	sw $zero, 0($s0)
