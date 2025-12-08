@@ -53,16 +53,16 @@ get_move:
 	jal get_row
 	jal get_col
 	jal get_num
-	addi $t0, $t0, -1 #Currently holds column
-	addi $t1, $t1, -1 #Currently holds row
-	load_entry($t0, $t1, $s2)
-	bne $s2, 0, taken
-	move $a0, $t0
-	move $a1, $t1
-	move $a2, $t2
-	sw $t0, column
-	sw $t1, row
-	sw $t2, user_value
+	addi $s1, $s1, -1 #Currently holds column
+	addi $s0, $s0, -1 #Currently holds row
+	load_entry($s1, $s0, $s3)
+	bne $s3, 0, taken
+	move $a0, $s1
+	move $a1, $s0
+	move $a2, $s2
+	sw $s1, column
+	sw $s0, row
+	sw $s2, user_value
 	jal safe_to_place
 	beq $v0, 1, place
 	printString(invalid_move_msg)
