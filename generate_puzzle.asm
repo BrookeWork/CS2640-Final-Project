@@ -328,8 +328,6 @@ digging_complete:
 	printInt($s7)
 	printChar('\n')
 	
-	j done
-	
 	#Step 4: Propagate (shuffle non-destructively) the puzzle for uniqueness
 propagate:
 	#get how many times we will propagate the board in s0
