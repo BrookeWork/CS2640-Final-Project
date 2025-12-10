@@ -37,6 +37,7 @@
 	num_prompt: .asciiz "Number (1-9 or 0 to restart turn): "
 	invalid_input_msg: .asciiz "Invalid input, must be between 1 and 9.\n"
 	invalid_difficulty_msg: .asciiz "Invalid input, must be between 1 and 5.\n"
+	invalid_entree_msg: .asciiz "Invalid input, please enter a valid integer.\n"
 	invalid_play_msg: .asciiz "Invalid input, must be either 0 or 1.\n"
 	invalid_move_msg: .asciiz "That move is not allowed by Sudoku rules.\n"
 	continue_prompt: .asciiz "Enter 1 to continue playing, 0 to exit: "
@@ -278,7 +279,7 @@ invalid_char:
 
 invalid_input:
 	# Empty or otherwise invalid; prompt and re-read
-	printString(invalid_input_msg)
+	printString(invalid_entree_msg)
 	j read_input
 
 parsing_done:
